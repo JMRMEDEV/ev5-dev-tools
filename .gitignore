@@ -1,2 +1,5 @@
 # Cache
 .template-cache
+
+# Node modules
+*node_modules

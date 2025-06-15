@@ -1,6 +1,6 @@
 {
   "name": "ev5-dev-tools",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI tool to scaffold EV5 C SDK projects",
   "bin": {
     "ev5-dev-tools": "index.js"
@@ -12,5 +12,8 @@
     "cli"
   ],
   "author": "JMRMEDEV",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "simple-git": "^3.28.0"
+  }
 }
