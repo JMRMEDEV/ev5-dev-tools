@@ -1,0 +1,11 @@
+{
+  "name": "ev5-dev-tools",
+  "version": "1.0.0",
+  "description": "CLI tool to scaffold EV5 C SDK projects",
+  "bin": {
+    "ev5-dev-tools": "./index.js"
+  },
+  "keywords": ["ev5", "robotics", "c-sdk", "cli"],
+  "author": "JMRMEDEV",
+  "license": "MIT"
+}
