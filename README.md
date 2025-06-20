@@ -12,9 +12,39 @@ The generated project includes:
 
 ## Prerequisites
 
+### Required Tools
+
 - [Node.js](https://nodejs.org/en) must be installed.
-- `arm-none-eabi-gcc` and `arm-none-eabi-objcopy` must be available in your PATH (part of the EV5 SDK toolchain).
-- Set the `EV5_SDK` environment variable pointing to your EV5 SDK path (e.g., `C:\ev5-sdk`).
+- `arm-none-eabi-gcc` and `arm-none-eabi-objcopy` must be available in your `PATH`.
+
+### Setup: EV5 SDK
+
+1. **Download Kazi-Scratch** from your EV5 hardware provider (Windows `.exe` installer).
+
+   - **Linux users**: May need to extract the `.exe` using Wine or another method.
+
+2. **Extract the compiler resources**:
+
+   - Find the `includeRTOSEV5` folder under the installation directory (e.g.,\
+     `C:\Program Files (x86)\Scratch2-KAZI\compiler\...`).
+   - Copy it to a safe location, e.g., `C:\ev5-sdk\includeRTOSEV5`.
+
+3. **Set up environment variable**:
+
+   - Create an environment variable named `EV5_SDK` that points to the root SDK directory (e.g., `C:\ev5-sdk`).
+   - This allows the CLI to locate headers and linker scripts for builds.
+
+4. Ensure `arm-none-eabi-*` tools are available globally (can be downloaded from ARM or installed via package managers).
+
+5. Ensure the compiled `.c` program has access to `RTOSEV5` object files (typically found in `EV5_SDK/includeRTOSEV5/o/`).
+
+### Setup: Uploading via USB
+
+- Plug in the EV5 device via USB.
+- Power on the EV5 and enter **Download mode** (usually via a button on the brick).
+- The device must be mounted and visible with the volume label `EV5`.
+
+> **WiFi Upload** is not yet supported.
 
 Optional: Install globally for convenience:
 
@@ -114,3 +144,4 @@ You can view, extend, or contribute to available templates.
 ## License
 
 MIT
+
