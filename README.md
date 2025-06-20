@@ -1,19 +1,22 @@
 # EV5 Dev Tools
 
-**EV5 Dev Tools** is an npm-based **CLI utility** that helps you scaffold a **KAZI-EV5** project using **ANSI C** instead of **KAZI Scratch**. This streamlines your development workflow by generating a ready-to-use project structure.
+**EV5 Dev Tools** is an npm-based **CLI utility** that helps you scaffold and manage **KAZI-EV5** ANSI C projects. It streamlines your development workflow by providing commands to **create**, **build**, and **upload** projects directly from the command line.
 
 The generated project includes:
 
-- A basic `main.c` file that includes basic **EV5 C SDK** headers.
-- A preconfigured `.vscode/settings.json` for the correct **compiler**, **include paths**, and **IntelliSense** settings.
-- A `scripts/` directory containing scripts for **building** and **uploading** code to the EV5.
+- A basic `main.c` or chosen program source file.
+- A preconfigured `.vscode/settings.json` for the correct **compiler**, **include paths**, and **IntelliSense**.
+- Built-in CLI commands to **build** and **upload** without relying on PowerShell scripts.
 
 ---
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/en) must be installed.
-- (Optional) You can install this package globally to use it from anywhere:
+- `arm-none-eabi-gcc` and `arm-none-eabi-objcopy` must be available in your PATH (part of the EV5 SDK toolchain).
+- Set the `EV5_SDK` environment variable pointing to your EV5 SDK path (e.g., `C:\ev5-sdk`).
+
+Optional: Install globally for convenience:
 
 ```bash
 npm install -g ev5-dev-tools
@@ -21,7 +24,7 @@ npm install -g ev5-dev-tools
 
 ---
 
-## Usage
+## CLI Usage
 
 ### Create a New Project
 
@@ -31,46 +34,80 @@ To create a new project using the **default** template:
 ev5-dev-tools create my-project
 ```
 
-This will generate a `my-project/` folder with the default template files.
-
 To use a specific template (e.g., `display`):
 
 ```bash
 ev5-dev-tools create my-project --template=display
 ```
 
-This will generate a `my-project/` folder using the `display` template, merged with the shared configuration files.
+This pulls templates from the [ev5-dev-tools-templates](https://github.com/JMRMEDEV/ev5-dev-tools-templates) repo.
 
 ---
 
-## Example Output
+### Build a Program
+
+Compile your program by specifying the name of the `.c` file (without extension):
 
 ```bash
-ev5-dev-tools create lcd-test --template=display
+ev5-dev-tools build --program=wifi16
 ```
 
-Creates a folder like this:
+If `--program` is omitted, it defaults to `main`, compiling `main.c`.
 
+The resulting `.bin` file will be created in the current directory.
+
+---
+
+### Upload to EV5
+
+Upload the compiled `.bin` file to an EV5 USB device:
+
+```bash
+ev5-dev-tools upload --program=wifi16
 ```
-lcd-test/
+
+- The tool auto-detects the EV5 USB drive based on the volume label `EV5`.
+- Works on **Windows**, **macOS**, and **Linux**.
+- If `--program` is omitted, it defaults to `main`.
+
+---
+
+### Other Commands
+
+Show version:
+
+```bash
+ev5-dev-tools --version
+```
+
+Show help:
+
+```bash
+ev5-dev-tools --help
+```
+
+---
+
+## Example Project Structure
+
+```text
+my-project/
 ├── .vscode/
 │   └── c_cpp_properties.json
-├── scripts/
-│   ├── build.ps1
-│   └── upload.ps1
 ├── main.c
-└── .gitignore
+├── .gitignore
+└── (other template files)
 ```
 
 ---
 
 ## Template Repository
 
-Templates are maintained in a separate repository:
+Templates are maintained separately:
 
 - [ev5-dev-tools-templates](https://github.com/JMRMEDEV/ev5-dev-tools-templates)
 
-You can view, modify, or contribute templates there.
+You can view, extend, or contribute to available templates.
 
 ---
 
