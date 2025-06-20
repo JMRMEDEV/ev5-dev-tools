@@ -131,6 +131,67 @@ my-project/
 
 ---
 
+## Notes
+
+Please, consider the following guidance for your development workflow.
+
+### Intended Use
+
+#### Compiling
+
+These commands mimic the ones we originally tested with the Kazi SDK compiler:
+
+1. `.o` file creation:
+
+```bash
+..\..\compiler\ARM\bin\arm-none-eabi-gcc -I..\..\compiler\includeRTOSEV5 -mcpu=cortex-m3 -mthumb -Os -fsigned-char -w -gdwarf-2 -DF_CPU=72000000UL -std=gnu99 -c main.c -o main.o
+```
+
+2. `.elf` file creation:
+
+```bash
+..\..\compiler\ARM\bin\arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -L..\..\compiler\includeRTOSEV5/o -T..\..\compiler\includeRTOSEV5\o\stm32_flash.ld --% -Wl,--gc-sections -Wl,-Map=main.map,-cref main.o -lm -o main.elf
+```
+
+3. `.bin` conversion:
+
+```bash
+..\..\compiler\ARM\bin\arm-none-eabi-objcopy.exe -O binary main.elf main.bin
+```
+
+### Linux Support
+
+- Full Linux support is planned.
+- However, since the build and upload logic is implemented in Node.js, core functionality may already work on Linux systems without modification.
+
+### Compiler
+
+The CLI now supports using the **officially distributed** `arm-none-eabi` compiler instead of the bundled version from Kazi-Scratch.
+
+Original compiler reference:
+
+1. `arm-none-eabi-gcc`:
+
+```
+arm-none-eabi-gcc.exe (GNU Tools for ARM Embedded Processors) 4.8.4 20140526 (release)
+```
+
+2. `arm-none-eabi-objcopy`:
+
+```
+GNU objcopy (GNU Tools for ARM Embedded Processors) 2.23.2.20140529
+```
+
+We installed a nearly identical version from [Launchpad GCC ARM Embedded Downloads](https://launchpad.net/gcc-arm-embedded/+download?direction=backwards\&memo=10).
+
+### Next Steps
+
+- Add WiFi-based program uploading.
+- Finalize full Linux support.
+- Test and document compatibility with newer versions of `arm-none-eabi`.
+
+---
+
 ## Template Repository
 
 Templates are maintained separately:
@@ -144,4 +205,3 @@ You can view, extend, or contribute to available templates.
 ## License
 
 MIT
-
