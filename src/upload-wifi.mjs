@@ -204,9 +204,12 @@ class WiFiUploader {
                     this.downloadStep_V1();
                 } else if (status === 4) {
                     const checkSum = data[4];
+                    console.log(`Received checksum: ${checkSum}, expected: ${this.lastCheckSum}`);
                     if (checkSum === this.lastCheckSum) {
                         this.pageCount++;
+                        console.log(`Page ${this.pageCount - 1} acknowledged, moving to page ${this.pageCount}`);
                     }
+                    // Continue with next data packet
                     this.downloadStep_V1();
                 }
             }
@@ -320,9 +323,12 @@ class WiFiUploader {
             this.sendFileData_V1(this.pageCount);
         }
 
-        this.downloadResendId = setTimeout(() => {
-            this.downloadStep_V1();
-        }, 1000);
+        // Only set timeout for non-data transfer steps
+        if (this.downloadStep < 6) {
+            this.downloadResendId = setTimeout(() => {
+                this.downloadStep_V1();
+            }, 1000);
+        }
 
         if (this.downloadFinish) {
             console.log('Download finished!');
