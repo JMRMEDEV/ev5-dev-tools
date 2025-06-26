@@ -518,9 +518,10 @@ class WiFiUploader {
         packet[3] = 0x10; // Low byte of length (1040 total)
         packet[4] = 238; // 0xEE
         packet[5] = 255; // 0xFF
-        packet[6] = fullData[0]; // Pairing code byte 1
-        packet[7] = fullData[1]; // Pairing code byte 2
-        packet[8] = fullData[2]; // Pairing code byte 3
+        // Pairing code in kernel expected format: buf[1] << 8 | buf[0] << 16 | buf[2]
+        packet[6] = (this.pairingCode >> 8) & 0xFF;  // buf[0] - middle byte
+        packet[7] = (this.pairingCode >> 16) & 0xFF; // buf[1] - high byte  
+        packet[8] = this.pairingCode & 0xFF;         // buf[2] - low byte
         payloadData.copy(packet, 9); // Data starts at offset 9
         packet[1039] = 190; // 0xBE at end
 
