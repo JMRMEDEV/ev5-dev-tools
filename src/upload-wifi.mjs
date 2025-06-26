@@ -195,6 +195,10 @@ class WiFiUploader {
                 console.log(`Download status: ${status}`);
                 if (status === 1) {
                     this.downloadStep++;
+                    // For step 5 (start download), move directly to data transfer
+                    if (this.downloadStep === 6) {
+                        console.log('Ready for data transfer');
+                    }
                     this.downloadStep_V1();
                 } else if (status === 3) {
                     // Ready for data transfer - move to data phase
