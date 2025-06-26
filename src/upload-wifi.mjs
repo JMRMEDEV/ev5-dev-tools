@@ -493,16 +493,37 @@ class WiFiUploader {
         const high = (pageIndex >> 8) & 0xFF;
         checksum = (checksum + low + high) & 0xFF;
 
-        const data = Buffer.alloc(1029);
-        data[0] = 86;  // 0x56
-        data[1] = 171; // 0xAB
-        data[2] = low;
-        data[3] = high;
-        pageData.copy(data, 4);
-        data[1027] = checksum & 0xFF;
-        data[1028] = 207; // 0xCF
+        // Build data packet matching successful exchange: 0xEE 0xFF + 0x56 0xAB header
+        const payloadData = Buffer.alloc(1029);
+        payloadData[0] = 86;  // 0x56
+        payloadData[1] = 171; // 0xAB
+        payloadData[2] = low;
+        payloadData[3] = high;
+        pageData.copy(payloadData, 4);
+        payloadData[1027] = checksum & 0xFF;
+        payloadData[1028] = 207; // 0xCF
 
-        this.send(data);
+        // Use 0xEE 0xFF command for data packets (not 0xAA 0x03)
+        const fullData = Buffer.alloc(payloadData.length + 3);
+        fullData[0] = this.pairingCode >> 16;
+        fullData[1] = this.pairingCode >> 8;
+        fullData[2] = this.pairingCode & 0xFF;
+        payloadData.copy(fullData, 3);
+
+        const packet = Buffer.alloc(fullData.length + 7);
+        packet[0] = 120; // 0x78
+        packet[1] = 205; // 0xCD
+        packet[2] = (packet.length >> 8) & 0xFF;
+        packet[3] = packet.length & 0xFF;
+        packet[4] = 238; // 0xEE
+        packet[5] = 255; // 0xFF
+        fullData.copy(packet, 6);
+        packet[packet.length - 1] = 190; // 0xBE
+
+        console.log('Sending data packet:', Array.from(packet).map(b => b.toString(16).padStart(2, '0')).join(' '));
+        this.socket.send(packet, this.targetPort, this.targetIP, (err) => {
+            if (err) console.error('Error sending data packet:', err);
+        });
     }
 
     downloadComplete() {
