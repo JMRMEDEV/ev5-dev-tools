@@ -460,6 +460,8 @@ class WiFiUploader {
 
     sendFileData_V1(pageIndex) {
         if (pageIndex >= this.pageSum) {
+            console.log('All pages sent, sending completion packet...');
+            this.sendCompletionPacket();
             this.downloadFinish = true;
             return;
         }
@@ -521,6 +523,20 @@ class WiFiUploader {
         this.socket.send(packet, this.targetPort, this.targetIP, (err) => {
             if (err) console.error('Error sending data packet:', err);
         });
+    }
+
+    sendCompletionPacket() {
+        const data = Buffer.alloc(13);
+        data[0] = 86;  // 0x56
+        data[1] = 171; // 0xAB
+        data[2] = 10;  // Completion command
+        data.writeUInt32BE(0, 3);
+        data.writeUInt32BE(0, 7);
+        data[11] = 10;  // checksum
+        data[12] = 207; // 0xCF
+
+        console.log('Sending completion packet');
+        this.send(data);
     }
 
     downloadComplete() {
