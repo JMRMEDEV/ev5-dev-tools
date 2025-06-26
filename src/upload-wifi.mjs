@@ -503,23 +503,26 @@ class WiFiUploader {
         payloadData[1027] = checksum & 0xFF;
         payloadData[1028] = 207; // 0xCF
 
-        // Use 0xEE 0xFF command for data packets - CRITICAL: must be exactly 1040 bytes total
-        const fullData = Buffer.alloc(payloadData.length + 4); // +4 instead of +3 for exact 1040 bytes
+        // Use 0xEE 0xFF command for data packets - match exact successful exchange structure
+        const fullData = Buffer.alloc(payloadData.length + 3);
         fullData[0] = this.pairingCode >> 16;
         fullData[1] = this.pairingCode >> 8;
         fullData[2] = this.pairingCode & 0xFF;
-        fullData[3] = 0; // Extra byte to match successful exchange
-        payloadData.copy(fullData, 4);
+        payloadData.copy(fullData, 3);
 
-        const packet = Buffer.alloc(fullData.length + 7);
+        // Build packet exactly like successful exchange: 78 cd 04 10 ee ff 07 ee fd [data]
+        const packet = Buffer.alloc(1040); // Exact size from successful exchange
         packet[0] = 120; // 0x78
         packet[1] = 205; // 0xCD
-        packet[2] = (packet.length >> 8) & 0xFF;
-        packet[3] = packet.length & 0xFF;
+        packet[2] = 0x04; // High byte of length
+        packet[3] = 0x10; // Low byte of length (1040 total)
         packet[4] = 238; // 0xEE
         packet[5] = 255; // 0xFF
-        fullData.copy(packet, 6);
-        packet[packet.length - 1] = 190; // 0xBE
+        packet[6] = fullData[0]; // Pairing code byte 1
+        packet[7] = fullData[1]; // Pairing code byte 2
+        packet[8] = fullData[2]; // Pairing code byte 3
+        payloadData.copy(packet, 9); // Data starts at offset 9
+        packet[1039] = 190; // 0xBE at end
 
         console.log('Sending data packet:', Array.from(packet).map(b => b.toString(16).padStart(2, '0')).join(' '));
         this.socket.send(packet, this.targetPort, this.targetIP, (err) => {
