@@ -295,7 +295,9 @@ class WiFiUploader {
         console.log(`File size: ${this.binFileData.length} bytes`);
         console.log(`Pages: ${this.pageSum}`);
 
-        // Skip WiFiDownloadToUserSpace and go directly to download steps
+        // Call WiFiDownloadToUserSpace before starting download steps
+        this.wiFiDownloadToUserSpace();
+        this.wiFiDownloadToUserSpace();
         this.downloadStep_V1();
     }
 
