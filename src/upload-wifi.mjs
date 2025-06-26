@@ -503,12 +503,13 @@ class WiFiUploader {
         payloadData[1027] = checksum & 0xFF;
         payloadData[1028] = 207; // 0xCF
 
-        // Use 0xEE 0xFF command for data packets (not 0xAA 0x03)
-        const fullData = Buffer.alloc(payloadData.length + 3);
+        // Use 0xEE 0xFF command for data packets - CRITICAL: must be exactly 1040 bytes total
+        const fullData = Buffer.alloc(payloadData.length + 4); // +4 instead of +3 for exact 1040 bytes
         fullData[0] = this.pairingCode >> 16;
         fullData[1] = this.pairingCode >> 8;
         fullData[2] = this.pairingCode & 0xFF;
-        payloadData.copy(fullData, 3);
+        fullData[3] = 0; // Extra byte to match successful exchange
+        payloadData.copy(fullData, 4);
 
         const packet = Buffer.alloc(fullData.length + 7);
         packet[0] = 120; // 0x78
