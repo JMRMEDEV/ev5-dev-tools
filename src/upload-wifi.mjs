@@ -195,22 +195,15 @@ class WiFiUploader {
                 console.log(`Download status: ${status}`);
                 if (status === 1) {
                     this.downloadStep++;
-                    // For step 5 (start download), move directly to data transfer
-                    if (this.downloadStep === 6) {
-                        console.log('Ready for data transfer');
-                    }
                     this.downloadStep_V1();
                 } else if (status === 3) {
-                    // Ready for data transfer - move to data phase
-                    if (this.downloadStep === 5) {
-                        this.downloadStep = 6;
-                        // Add 100ms delay before starting data transfer
-                        setTimeout(() => {
-                            this.downloadStep_V1();
-                        }, 100);
-                        return;
-                    }
-                    this.downloadStep_V1();
+                    // Device is ready for data transfer
+                    this.downloadStep = 6;
+                    console.log('Device ready for data transfer (status 3)');
+                    setTimeout(() => {
+                        this.downloadStep_V1();
+                    }, 100);
+                    return;
                 } else if (status === 4) {
                     const checkSum = data[4];
                     console.log(`Received checksum: ${checkSum}, expected: ${this.lastCheckSum}`);
@@ -218,7 +211,6 @@ class WiFiUploader {
                         this.pageCount++;
                         console.log(`Page ${this.pageCount - 1} acknowledged, moving to page ${this.pageCount}`);
                     }
-                    // Continue with next data packet
                     this.downloadStep_V1();
                 }
             }
@@ -334,8 +326,8 @@ class WiFiUploader {
             this.sendFileData_V1(this.pageCount);
         }
 
-        // Only set timeout for non-data transfer steps
-        if (this.downloadStep < 6) {
+        // Set timeout for retries, but not during active data transfer
+        if (this.downloadStep < 6 || (this.downloadStep === 6 && this.pageCount === 0)) {
             this.downloadResendId = setTimeout(() => {
                 this.downloadStep_V1();
             }, 1000);
