@@ -204,6 +204,11 @@ class WiFiUploader {
                     // Ready for data transfer - move to data phase
                     if (this.downloadStep === 5) {
                         this.downloadStep = 6;
+                        // Add 100ms delay before starting data transfer
+                        setTimeout(() => {
+                            this.downloadStep_V1();
+                        }, 100);
+                        return;
                     }
                     this.downloadStep_V1();
                 } else if (status === 4) {
