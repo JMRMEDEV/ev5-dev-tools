@@ -487,13 +487,14 @@ class WiFiUploader {
         const high = (pageIndex >> 8) & 0xFF;
         checksum = (checksum + low + high) & 0xFF;
 
-        const data = Buffer.alloc(1028);
+        const data = Buffer.alloc(1029);
         data[0] = 86;  // 0x56
         data[1] = 171; // 0xAB
         data[2] = low;
         data[3] = high;
         pageData.copy(data, 4);
         data[1027] = checksum & 0xFF;
+        data[1028] = 207; // 0xCF
 
         this.send(data);
     }
