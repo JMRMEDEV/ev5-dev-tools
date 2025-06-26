@@ -350,7 +350,6 @@ class WiFiUploader {
         data[3] = 254; // 0xFE
         data[4] = 0;
         data[5] = 0;
-        data[2] = data.length; // Fix length
         this.send(data);
     }
 
@@ -498,7 +497,7 @@ class WiFiUploader {
         data[1027] = checksum & 0xFF;
         data[1028] = 207; // 0xCF
 
-        this.send(data);
+        this.sendDataPacket(data);
     }
 
     downloadComplete() {
