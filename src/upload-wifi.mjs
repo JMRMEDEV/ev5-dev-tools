@@ -197,21 +197,31 @@ class WiFiUploader {
                     this.downloadStep++;
                     this.downloadStep_V1();
                 } else if (status === 3) {
-                    // Device is ready for data transfer
-                    this.downloadStep = 6;
-                    console.log('Device ready for data transfer (status 3)');
-                    setTimeout(() => {
+                    // Ready for data transfer - move to data phase
+                    if (this.downloadStep === 5) {
+                        this.downloadStep = 6;
+                        console.log('Ready for data transfer');
                         this.downloadStep_V1();
-                    }, 100);
-                    return;
-                } else if (status === 4) {
-                    const checkSum = data[4];
-                    console.log(`Received checksum: ${checkSum}, expected: ${this.lastCheckSum}`);
-                    if (checkSum === this.lastCheckSum) {
-                        this.pageCount++;
-                        console.log(`Page ${this.pageCount - 1} acknowledged, moving to page ${this.pageCount}`);
+                        return;
                     }
                     this.downloadStep_V1();
+                } else if (status === 4) {
+                    const pageIndex = data[4];
+                    console.log(`Data packet acknowledged for page: ${pageIndex}`);
+
+                    // Move to next page
+                    this.pageCount++;
+
+                    if (this.pageCount >= this.pageSum) {
+                        console.log('All pages sent, finishing download...');
+                        this.downloadFinish = true;
+                        this.downloadComplete();
+                        return;
+                    }
+
+                    // Send next data packet
+                    console.log(`Sending page ${this.pageCount}/${this.pageSum}`);
+                    this.sendFileData_V1(this.pageCount);
                 }
             }
         }
@@ -322,12 +332,16 @@ class WiFiUploader {
             console.log('Starting download...');
             this.setStartDownload_V1();
         } else if (this.downloadStep === 6) {
-            console.log(`Sending file data... ${Math.floor(this.pageCount / this.pageSum * 100)}%`);
-            this.sendFileData_V1(this.pageCount);
+            if (this.pageCount === 0) {
+                console.log(`Starting data transfer - sending page ${this.pageCount}/${this.pageSum}`);
+                this.sendFileData_V1(this.pageCount);
+            }
+            // For data transfer, don't set timeout - wait for acknowledgments
+            return;
         }
 
-        // Set timeout for retries, but not during active data transfer
-        if (this.downloadStep < 6 || (this.downloadStep === 6 && this.pageCount === 0)) {
+        // Set timeout for setup steps only
+        if (this.downloadStep < 6) {
             this.downloadResendId = setTimeout(() => {
                 this.downloadStep_V1();
             }, 1000);
