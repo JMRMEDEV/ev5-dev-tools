@@ -502,7 +502,7 @@ class WiFiUploader {
         data[1027] = checksum & 0xFF;
         data[1028] = 207; // 0xCF
 
-        this.sendDataPacket(data);
+        this.send(data);
     }
 
     downloadComplete() {
